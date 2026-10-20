@@ -4,4 +4,4 @@
  * What a client may send. No `user_id`: the owner comes from the JWT in the
  * handler, never from the request body.
  */
-export type CreateNote = { title: string; body: string; pinned: boolean | null };
+export type CreateNote = { title: string, body: string, pinned: boolean | null, };

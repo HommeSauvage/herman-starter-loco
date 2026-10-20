@@ -10,10 +10,4 @@
  * own `Pager`. Build it with [`Page::from_query`] rather than by hand — that
  * is what keeps the two in step.
  */
-export type Page<T> = {
-  items: Array<T>;
-  page: number;
-  page_size: number;
-  total_pages: number;
-  total_items: number;
-};
+export type Page<T> = { items: Array<T>, page: number, page_size: number, total_pages: number, total_items: number, };
