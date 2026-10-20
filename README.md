@@ -79,16 +79,50 @@ frontend/src/
 
 | Command | Purpose |
 |---|---|
-| `./scripts/setup.sh` | Install deps, migrate, seed, build the SPA |
+| `./scripts/setup.sh` | Install deps, migrate, seed, build the SPA, install git hooks |
 | `./scripts/dev.sh` | Loco on 5150 + Vite on 5173 |
 | `cargo loco start` | Serve the API and the built SPA on 5150 |
-| `./scripts/ci-check.sh` | The gate: fmt, clippy, tests, bindings, frontend |
+| `./scripts/ci-check.sh` | The gate: fmt, clippy, tests, docs, bindings, frontend |
 | `./scripts/preflight.sh` | One line per environment fact |
 | `./scripts/agent-report.sh` | One JSON line: versions, routes, migrations |
 | `cargo loco db seed` | Demo users (`user1@example.com` / `1234`) |
+| `./scripts/clean.sh` | Sweep stale artifacts and cap `target/` at 8 GB (`--full` = `cargo clean`) |
 | `./scripts/sync-skills.sh` | Mirror `.claude/skills/loco` to the other agent dirs |
 
 Demo login: **user1@example.com** / **1234** after `cargo loco db seed`.
+
+`setup.sh` installs a pre-commit hook that runs the full gate
+(`./scripts/ci-check.sh`). Bypass it only in an emergency with
+`git commit --no-verify`.
+
+## Performance & disk
+
+Rust build artifacts are the biggest thing in a repo like this. The starter is
+tuned for an agent loop:
+
+- **Toolchain pinned** in `rust-toolchain.toml` (1.99.1), and CI pins the same
+  version. A new stable cannot turn `-D warnings` red behind your back; bump
+  both together.
+- **Profiles** in `Cargo.toml`: dev keeps line tables for this crate only and
+  builds dependencies without debug info; release is thin-LTO, one codegen unit,
+  stripped symbols. Measured on a clean tree: `target/` after `cargo test` is
+  ~1.6 GB (was ~4.8 GB), and the release binary is ~18 MB (was 29 MB).
+- **`./scripts/clean.sh`** removes artifacts untouched for 30 days and caps
+  `target/` at 8 GB; `--full` runs `cargo clean`. It prints sccache stats when
+  sccache is installed.
+- **sccache** is optional locally and enabled in CI. It survives `cargo clean`,
+  branch switches and dependency bumps that invalidate the target cache:
+  ```bash
+  cargo install sccache   # or: brew install sccache
+  export RUSTC_WRAPPER=sccache
+  export CARGO_INCREMENTAL=0
+  sccache --show-stats
+  ```
+  CI runs it with the GitHub Actions backend alongside `Swatinem/rust-cache`:
+  the target cache covers a warm tree, sccache covers the rebuild after a
+  `Cargo.lock` change where most crates are unchanged.
+- **`cargo machete`** runs in the gate (when installed) and in CI, so unused
+  direct dependencies cannot quietly add compile time.
 
 ## Runtime notes
 
@@ -96,6 +130,7 @@ Demo login: **user1@example.com** / **1234** after `cargo loco db seed`.
 - Development mail is **stubbed**: register, reset and magic-link succeed without SMTP. Set `mailer.stub: false` and run Mailpit (`docker run -p 1025:1025 -p 8025:8025 axllent/mailpit`) to read mail.
 - `PORT` changes the API port; the Vite dev proxy reads the same variable.
 - `config/<env>.yaml` is the only settings source. Secrets belong in env vars referenced by `get_env`.
+- Production does **not** auto-migrate by default: run `cargo loco db migrate --environment production` as a release step, or set `DB_AUTO_MIGRATE=true` for a single-instance deploy.
 
 ## License
 

@@ -13,11 +13,11 @@ wizard: an agent turns it into one user's product.
 
 ## Stack
 
-Loco 1.2 / Rust / SeaORM 2 / SQLite by default (Postgres is a config change) · React 19 + Vite · Tailwind v4 + shadcn/ui · TanStack Query · React Router 8 · ts-rs typings generated from Rust DTOs.
+Loco 1.2 / Rust 1.99 (pinned in `rust-toolchain.toml`) / SeaORM 2 / SQLite by default (Postgres is a config change) · React 19 + Vite · Tailwind v4 + shadcn/ui · TanStack Query · React Router 8 · ts-rs typings generated from Rust DTOs.
 
 ## Gates
 
-- `./scripts/ci-check.sh` — `cargo fmt --check`, clippy `-D warnings`, `cargo test`, bindings drift, frontend lint/format/typecheck/build. Run it before saying done.
+- `./scripts/ci-check.sh` — `cargo fmt --check`, clippy `-D warnings`, `cargo test`, `cargo doc`, unused dependencies, bindings drift, frontend lint/format/typecheck/build. Run it before saying done. The pre-commit hook runs exactly this — never use `--no-verify`.
 - `cargo test` — request tests through `loco_rs::testing`, model tests, insta snapshots. Feature/request tests by default.
 - `cargo loco routes` after every generator — it is the cheapest proof that what you generated is reachable.
 - `cargo loco doctor` when boot, DB or mail misbehaves; it names the missing piece.
@@ -49,6 +49,14 @@ Loco 1.2 / Rust / SeaORM 2 / SQLite by default (Postgres is a config change) · 
 - Layout: `SidebarProvider` + `AppSidebar` + `SidebarInset`; the header carries breadcrumbs, theme and user menu. Mobile is the sidebar's sheet.
 - Shared: `PageHeader`, `StatCard`, `EmptyState`, `ErrorState`, `LoadingState`, `ConfirmDialog`.
 - Forms: `Field` + `Input`/`Textarea` + inline `FieldError`; disable submit with `isPending`. Toasts: `sonner`. Destructive actions go through `ConfirmDialog`.
+
+## Speed & disk
+
+- `target/` is the largest thing in this repo. `./scripts/clean.sh` sweeps artifacts untouched for 30 days and caps it at 8 GB; `--full` is `cargo clean`.
+- Profiles in `Cargo.toml` are deliberate: dev keeps line tables for this crate and no debug info for dependencies; release is thin-LTO with stripped symbols. Do not "fix" a slow build by turning debug info back on.
+- sccache is optional locally (`RUSTC_WRAPPER=sccache`, `CARGO_INCREMENTAL=0`) and enabled in CI with the GitHub Actions backend. Never put `RUSTC_WRAPPER` in `.cargo/config.toml`: it breaks machines without sccache.
+- The toolchain is pinned in `rust-toolchain.toml` and in CI's `RUST_TOOLCHAIN`. Bump both together and run the gate on the new version.
+- `cargo machete` runs in the gate when installed. Do not add a crate for something Loco already provides.
 
 ## Docs
 

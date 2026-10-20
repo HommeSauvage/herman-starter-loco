@@ -7,11 +7,22 @@ echo "==> cargo fmt"
 cargo fmt --all -- --check
 
 echo "==> cargo clippy"
-cargo clippy --all-targets -- -D warnings
+cargo clippy --locked --all-targets -- -D warnings
 
 echo "==> cargo test"
 # Also exports the ts-rs bindings the frontend imports.
-cargo test
+cargo test --locked
+
+echo "==> cargo doc"
+RUSTDOCFLAGS="-D rustdoc::broken_intra_doc_links -D rustdoc::invalid_html_tags" \
+  cargo doc --locked --no-deps --workspace
+
+echo "==> unused dependencies"
+if command -v cargo-machete >/dev/null 2>&1; then
+  cargo machete
+else
+  echo "skipped: cargo-machete is not installed (CI installs it)"
+fi
 
 echo "==> bindings drift"
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then

@@ -1,0 +1,7 @@
+# Pinned on purpose. A floating stable can add lints (or change codegen)
+# that turn `-D warnings` red without anyone touching this repo; bump this
+# deliberately, with a green CI run on the new version.
+[toolchain]
+channel = "1.99.1"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

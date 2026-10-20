@@ -29,6 +29,20 @@ else
   fail=1
 fi
 
+for tool in sccache cargo-sweep cargo-machete; do
+  if command -v "$tool" >/dev/null 2>&1; then
+    fact "$tool" "installed"
+  else
+    fact "$tool" "not installed (optional)"
+  fi
+done
+
+if command -v sccache >/dev/null 2>&1 && [ "${RUSTC_WRAPPER:-}" = "sccache" ]; then
+  fact "sccache active" "yes"
+else
+  fact "sccache active" "no — export RUSTC_WRAPPER=sccache"
+fi
+
 if [ -d frontend/node_modules ]; then
   fact "frontend deps" "installed"
 else

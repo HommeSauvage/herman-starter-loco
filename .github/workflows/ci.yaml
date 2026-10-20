@@ -14,6 +14,10 @@ permissions:
   contents: read
 
 env:
+  # Pinned, not `stable`. A new stable can add lints that turn `-D warnings`
+  # red without anyone changing this repo. Bump this together with
+  # rust-toolchain.toml, deliberately, with a green run on the new version.
+  RUST_TOOLCHAIN: "1.99.1"
   CARGO_TERM_COLOR: always
   # CI never debugs a binary and never reuses incremental artifacts between
   # runs: dropping debuginfo shrinks target/ and speeds up every link step.
@@ -31,6 +35,7 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
         with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
           components: rustfmt, clippy
 
       # Restores ~/.cargo and target/. The key follows Cargo.lock, the
@@ -38,6 +43,21 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
+
+      # sccache survives what rust-cache's key cannot: a dependency bump or a
+      # toolchain change that invalidates target/, while most crates are
+      # unchanged. Loco's own CI runs both caches for the same reason.
+      - uses: mozilla-actions/sccache-action@v0.0.11
+      - name: Enable sccache
+        run: |
+          echo "RUSTC_WRAPPER=sccache" >> "$GITHUB_ENV"
+          echo "SCCACHE_GHA_ENABLED=true" >> "$GITHUB_ENV"
+
+      - name: Unused dependencies
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-machete
+      - run: cargo machete
 
       - run: cargo fmt --all -- --check
 
@@ -49,6 +69,17 @@ jobs:
       # without the generated TypeScript being committed.
       - name: Bindings drift
         run: git diff --exit-code -- frontend/src/bindings
+
+      - name: Docs
+        run: cargo doc --locked --no-deps --workspace
+        env:
+          RUSTDOCFLAGS: >-
+            -D rustdoc::broken_intra_doc_links
+            -D rustdoc::invalid_html_tags
+
+      - name: sccache stats
+        if: always()
+        run: sccache --show-stats
 
   frontend:
     name: Frontend
@@ -76,3 +107,26 @@ jobs:
       - run: bun run format:check
       - run: bun run typecheck
       - run: bun run build
+
+  # Main only: the deploy path must compile, even though PRs do not need to
+  # pay for a second profile. Reports the artifact size the deploy docs quote.
+  release:
+    name: Release build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - run: cargo build --release --locked
+
+      - name: Report binary
+        run: ls -lh target/release/*-cli

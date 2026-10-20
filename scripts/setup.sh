@@ -22,3 +22,5 @@ if command -v sqlite3 >/dev/null 2>&1; then
 fi
 
 (cd frontend && bun run build)
+
+./scripts/install-hooks.sh

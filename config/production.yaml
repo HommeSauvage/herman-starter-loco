@@ -105,7 +105,11 @@ database:
   # Convenient for single-instance deploys. Turn it off if you run more than
   # one instance or migrate as a separate release step, so instances do not
   # race to migrate the same database.
-  auto_migrate: <%= get_env(name="DB_AUTO_MIGRATE", default="true") %>
+  # Migrations belong to a release step, not to every instance that boots:
+  # two replicas racing to migrate is how a deploy corrupts a schema. Run
+  # `cargo loco db migrate --environment production` before starting, or set
+  # DB_AUTO_MIGRATE=true for a single-instance convenience deployment.
+  auto_migrate: <%= get_env(name="DB_AUTO_MIGRATE", default="false") %>
   # Truncate database when application loaded. This is a dangerous operation, make sure that you using this flag only on dev environments or test mode
   dangerously_truncate: false
   # Recreating schema when application loaded.  This is a dangerous operation, make sure that you using this flag only on dev environments or test mode

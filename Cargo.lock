@@ -500,7 +500,6 @@ dependencies = [
  "axum-core",
  "bytes",
  "cookie",
- "form_urlencoded",
  "futures-util",
  "http",
  "http-body",
@@ -509,8 +508,6 @@ dependencies = [
  "pin-project-lite",
  "rustversion",
  "serde_core",
- "serde_html_form",
- "serde_path_to_error",
  "tower-layer",
  "tower-service",
  "tracing",
@@ -2060,7 +2057,6 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "axum",
- "axum-extra",
  "chrono",
  "include_dir",
  "insta",
@@ -2074,7 +2070,6 @@ dependencies = [
  "serial_test",
  "tokio",
  "tracing",
- "tracing-subscriber",
  "ts-rs",
  "uuid",
  "validator",
@@ -4377,19 +4372,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde_html_form"
-version = "0.2.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2f2d7ff8a2140333718bb329f5c40fc5f0865b84c426183ce14c97d2ab8154f"
-dependencies = [
- "form_urlencoded",
- "indexmap",
- "itoa",
- "ryu",
- "serde_core",
-]
-
-[[package]]
 name = "serde_json"
 version = "1.0.154"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5493,17 +5475,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tracing-log"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ee855f1f400bd0e5c02d150ae5de3840039a3f54b025156404e34c23c03f47c3"
-dependencies = [
- "log",
- "once_cell",
- "tracing-core",
-]
-
-[[package]]
 name = "tracing-serde"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5526,11 +5497,9 @@ dependencies = [
  "serde",
  "serde_json",
  "sharded-slab",
- "smallvec",
  "thread_local",
  "tracing",
  "tracing-core",
- "tracing-log",
  "tracing-serde",
 ]
 
