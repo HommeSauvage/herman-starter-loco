@@ -17,7 +17,7 @@ It is not maintained for human readers and never deployed as-is.
 - **SPA frontend** — React 19 + Vite + React Router 8 + TanStack Query
 - **Design system** — Tailwind v4 + shadcn/ui (new-york), light/dark tokens, app shell with sidebar and breadcrumbs, auth screens, loading/error/empty states
 - **Agent skill** — Loco's official skill (doctrine, API index, recipes) in `.claude/skills/loco`, mirrored to `.agents`, `.pi`, `.cursor`
-- **Gates** — `./scripts/ci-check.sh` runs fmt, clippy, tests, bindings drift and the frontend checks
+- **Gates** — `./scripts/ci-check.sh` runs fmt, clippy, tests, docs, unused-dependency and bindings checks, then the frontend checks
 
 ## The contract
 
