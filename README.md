@@ -118,9 +118,9 @@ tuned for an agent loop:
   export CARGO_INCREMENTAL=0
   sccache --show-stats
   ```
-  CI runs it with the GitHub Actions backend alongside `Swatinem/rust-cache`:
-  the target cache covers a warm tree, sccache covers the rebuild after a
-  `Cargo.lock` change where most crates are unchanged.
+  CI runs it with the GitHub Actions backend **only when the target cache
+  misses**: the warm tree needs no compiler cache, and the rebuild after a
+  `Cargo.lock` change reuses every crate that did not change.
 - **`cargo machete`** runs in the gate (when installed) and in CI, so unused
   direct dependencies cannot quietly add compile time.
 

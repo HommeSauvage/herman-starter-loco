@@ -54,7 +54,7 @@ Loco 1.2 / Rust 1.99 (pinned in `rust-toolchain.toml`) / SeaORM 2 / SQLite by de
 
 - `target/` is the largest thing in this repo. `./scripts/clean.sh` sweeps artifacts untouched for 30 days and caps it at 8 GB; `--full` is `cargo clean`.
 - Profiles in `Cargo.toml` are deliberate: dev keeps line tables for this crate and no debug info for dependencies; release is thin-LTO with stripped symbols. Do not "fix" a slow build by turning debug info back on.
-- sccache is optional locally (`RUSTC_WRAPPER=sccache`, `CARGO_INCREMENTAL=0`) and enabled in CI with the GitHub Actions backend. Never put `RUSTC_WRAPPER` in `.cargo/config.toml`: it breaks machines without sccache.
+- sccache is optional locally (`RUSTC_WRAPPER=sccache`, `CARGO_INCREMENTAL=0`) and enabled in CI with the GitHub Actions backend when the target cache misses. Never put `RUSTC_WRAPPER` in `.cargo/config.toml`: it breaks machines without sccache.
 - The toolchain is pinned in `rust-toolchain.toml` and in CI's `RUST_TOOLCHAIN`. Bump both together and run the gate on the new version.
 - `cargo machete` runs in the gate when installed. Do not add a crate for something Loco already provides.
 

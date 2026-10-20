@@ -40,15 +40,20 @@ jobs:
 
       # Restores ~/.cargo and target/. The key follows Cargo.lock, the
       # toolchain and .cargo/config.toml, so a dependency change invalidates it.
-      - uses: Swatinem/rust-cache@v2
+      - id: rust-cache
+        uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
 
       # sccache survives what rust-cache's key cannot: a dependency bump or a
       # toolchain change that invalidates target/, while most crates are
-      # unchanged. Loco's own CI runs both caches for the same reason.
-      - uses: mozilla-actions/sccache-action@v0.0.11
+      # unchanged. On a warm target cache it would never be asked to compile
+      # and only adds setup/teardown time, so it is conditional on the miss.
+      - name: Setup sccache
+        if: steps.rust-cache.outputs.cache-hit != 'true'
+        uses: mozilla-actions/sccache-action@v0.0.11
       - name: Enable sccache
+        if: steps.rust-cache.outputs.cache-hit != 'true'
         run: |
           echo "RUSTC_WRAPPER=sccache" >> "$GITHUB_ENV"
           echo "SCCACHE_GHA_ENABLED=true" >> "$GITHUB_ENV"
@@ -78,7 +83,7 @@ jobs:
             -D rustdoc::invalid_html_tags
 
       - name: sccache stats
-        if: always()
+        if: always() && steps.rust-cache.outputs.cache-hit != 'true'
         run: sccache --show-stats
 
   frontend:
