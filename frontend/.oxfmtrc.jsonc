@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 80,
+  "tabWidth": 2,
+  "semi": true,
+  "singleQuote": false,
+  "htmlWhitespaceSensitivity": "css",
+  "sortTailwindcss": {
+    "stylesheet": "src/index.css",
+    "functions": ["clsx", "cn", "cva"]
+  },
+  "sortImports": true,
+  "sortPackageJson": false,
+  "ignorePatterns": ["src/components/ui/*", "src/bindings/**", "dist"]
+}
