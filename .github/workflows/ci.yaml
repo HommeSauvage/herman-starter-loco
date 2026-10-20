@@ -5,19 +5,45 @@ on:
     branches: [master, main]
   pull_request:
 
+# A newer push to the same ref makes the older run obsolete.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  # CI never debugs a binary and never reuses incremental artifacts between
+  # runs: dropping debuginfo shrinks target/ and speeds up every link step.
+  CARGO_INCREMENTAL: "0"
+  CARGO_PROFILE_DEV_DEBUG: "0"
+  CARGO_PROFILE_TEST_DEBUG: "0"
+
 jobs:
   rust:
     name: Rust
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+
+      # Restores ~/.cargo and target/. The key follows Cargo.lock, the
+      # toolchain and .cargo/config.toml, so a dependency change invalidates it.
       - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
       - run: cargo fmt --all -- --check
-      - run: cargo clippy --all-targets -- -D warnings
-      - run: cargo test
+
+      - run: cargo clippy --locked --all-targets -- -D warnings
+
+      - run: cargo test --locked
 
       # cargo test exports the ts-rs bindings. A diff here means a DTO changed
       # without the generated TypeScript being committed.
@@ -27,14 +53,24 @@ jobs:
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: 1.4.3
+
+      # setup-bun caches the binary, not packages.
+      - uses: actions/cache@v6
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('frontend/bun.lock') }}
+          restore-keys: ${{ runner.os }}-bun-
+
       - run: bun install --frozen-lockfile
       - run: bun run lint
       - run: bun run format:check
