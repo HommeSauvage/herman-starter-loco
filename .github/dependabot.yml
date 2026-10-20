@@ -4,6 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    ignore:
+      # Loco 1.2 pins validator 0.20; 0.21 splits the Validatable trait.
+      - dependency-name: "validator"
+        versions: [">=0.21.0"]
   - package-ecosystem: bun
     directory: "/frontend"
     schedule:
