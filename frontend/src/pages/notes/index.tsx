@@ -1,4 +1,4 @@
-import { Pin, Plus, Search, StickyNote } from "lucide-react";
+import { MoreHorizontal, Pin, Plus, Search, StickyNote } from "lucide-react";
 import { useDeferredValue, useState } from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
@@ -62,7 +62,7 @@ function NoteRow({ note, onDelete }: { note: NoteDto; onDelete: () => void }) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon-sm" aria-label="Note actions">
-              <span className="text-lg leading-none">···</span>
+              <MoreHorizontal />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
