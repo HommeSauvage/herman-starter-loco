@@ -59,5 +59,5 @@ Loco 1.2 / Rust / SeaORM 2 / SQLite by default (Postgres is a config change) · 
 - Ports: API 5150 (`PORT=5151 cargo loco start`), Vite 5173. The Vite proxy reads `PORT`.
 - Frontend changes not showing: Loco serves the *built* `frontend/dist`. Run `bun run build`, or use `bun run dev` while iterating.
 - `sea-orm-cli` is required for `cargo loco db entities`; `./scripts/preflight.sh` says what is missing.
-- Skills: `.claude/skills/loco` is the official, version-matched copy. `.agents`, `.pi` and `.cursor` hold identical copies — edit `.claude` and run `./scripts/sync-skills.sh`.
+- Skills: `.claude/skills/loco` is the official, version-matched copy. `.agents`, `.pi` and `.cursor` hold identical copies — edit `.claude` and run `./scripts/sync-skills.sh`. After bumping `loco-rs`, refresh it from `skills/loco/` at the matching tag of github.com/loco-rs/loco, then sync.
 - Demo login after `cargo loco db seed`: `user1@example.com` / `1234`.
