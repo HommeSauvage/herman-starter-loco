@@ -86,6 +86,7 @@ frontend/src/
 | `./scripts/preflight.sh` | One line per environment fact |
 | `./scripts/agent-report.sh` | One JSON line: versions, routes, migrations |
 | `cargo loco db seed` | Demo users (`user1@example.com` / `1234`) |
+| `cargo loco db reset` | Drop and re-migrate the dev database (`db entities` after schema changes) |
 | `./scripts/clean.sh` | Sweep stale artifacts and cap `target/` at 8 GB (`--full` = `cargo clean`) |
 | `./scripts/sync-skills.sh` | Mirror `.claude/skills/loco` to the other agent dirs |
 
