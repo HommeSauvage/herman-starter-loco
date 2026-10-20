@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 
 import { ApiClientError, post } from "@/api/client";
 import { setToken } from "@/auth/token";
+import type { LoginResponse } from "@/bindings/LoginResponse";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -14,20 +15,15 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { usePageTitle } from "@/hooks/use-page-title";
 import { AuthLayout } from "@/layouts/auth-layout";
-
-interface LoginResponse {
-  token: string;
-  pid: string;
-  name: string;
-  is_verified: boolean;
-}
 
 interface LocationState {
   from?: string;
 }
 
 export function LoginPage() {
+  usePageTitle("Sign in");
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();

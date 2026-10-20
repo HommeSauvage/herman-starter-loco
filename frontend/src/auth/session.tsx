@@ -4,15 +4,10 @@ import type { ReactNode } from "react";
 
 import { get } from "@/api/client";
 import { clearToken, useToken } from "@/auth/token";
-
-export interface SessionUser {
-  pid: string;
-  name: string;
-  email: string;
-}
+import type { CurrentResponse } from "@/bindings/CurrentResponse";
 
 interface SessionContextValue {
-  user: SessionUser | null;
+  user: CurrentResponse | null;
   token: string | null;
   isLoading: boolean;
   signOut: () => void;
@@ -26,7 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const { data, isPending } = useQuery({
     queryKey: ["session", token],
-    queryFn: () => get<SessionUser>("/api/auth/current"),
+    queryFn: () => get<CurrentResponse>("/api/auth/current"),
     enabled: token !== null,
     retry: false,
     staleTime: 5 * 60_000,

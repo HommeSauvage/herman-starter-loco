@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router";
 
 import { ApiClientError, post } from "@/api/client";
 import { setToken } from "@/auth/token";
+import type { LoginResponse } from "@/bindings/LoginResponse";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -13,16 +14,11 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { usePageTitle } from "@/hooks/use-page-title";
 import { AuthLayout } from "@/layouts/auth-layout";
 
-interface LoginResponse {
-  token: string;
-  pid: string;
-  name: string;
-  is_verified: boolean;
-}
-
 export function RegisterPage() {
+  usePageTitle("Create account");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 

@@ -29,7 +29,7 @@ Loco 1.2 / Rust / SeaORM 2 / SQLite by default (Postgres is a config change) · 
 - Register everything in `src/app.rs`: routes, workers, tasks, seeds, truncate. Generators inject into it; if you add by hand, that is the file that makes it real.
 - Schema lives in `migration/src/*`; entities in `src/models/_entities/**` are generated. After a migration: `cargo loco db migrate && cargo loco db entities`. Never edit under `_entities/`.
 - Fat model, slim controller. Finders, filtering and counts on `impl Model`; handlers parse, call one or two model methods, render. `src/controllers/notes.rs` is the reference.
-- Auth is `auth: auth::JWT`. Resolve the caller with `users::Model::find_by_pid` and scope every query to them. **Never accept an owner id in a request body** — `CreateNote`/UpdateNote` deliberately have no `user_id`.
+- Auth is `auth: auth::JWT`. Resolve the caller with `users::Model::find_by_pid` and scope every query to them. **Never accept an owner id in a request body** — `CreateNote` and `UpdateNote` deliberately have no `user_id`.
 - Wire types are DTOs in `src/dtos/*`, deriving `TS` with `#[ts(export)]`. Entities never go on the wire. `cargo test` exports the bindings; commit them.
 - `config/<env>.yaml` is the only settings source. No `std::env::var` in app code. Development mail is stubbed so register/reset work with no SMTP.
 

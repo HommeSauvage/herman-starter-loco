@@ -6,9 +6,11 @@ import { post } from "@/api/client";
 import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { usePageTitle } from "@/hooks/use-page-title";
 import { AuthLayout } from "@/layouts/auth-layout";
 
 export function ForgotPasswordPage() {
+  usePageTitle("Reset password");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [isPending, setIsPending] = useState(false);
