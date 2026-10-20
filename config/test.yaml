@@ -25,8 +25,11 @@ server:
     fallback:
       enable: false
     static:
-      enable: true
-      must_exist: true
+      # Tests exercise the API, not the SPA. Keeping static serving on makes
+      # every test boot require a built `frontend/dist`, so a fresh clone (and
+      # CI) fails before the first assertion.
+      enable: false
+      must_exist: false
       precompressed: false
       folder:
         uri: "/"

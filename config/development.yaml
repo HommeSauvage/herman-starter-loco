@@ -30,7 +30,10 @@ server:
       enable: false
     static:
       enable: true
-      must_exist: true
+      # Do not require a frontend build just to boot the CLI. Migrations,
+      # generators, routes and tests must work on a fresh clone; the SPA is
+      # served once `bun run build` has written frontend/dist.
+      must_exist: false
       precompressed: false
       folder:
         uri: "/"
